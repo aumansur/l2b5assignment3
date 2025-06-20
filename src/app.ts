@@ -1,22 +1,28 @@
 import express, { NextFunction, Request, Response } from "express";
 import { booksRouter } from "./app/controllers/book.controllers";
-// import itemRoutes from "./routes/itemRoutes";
-// import { errorHandler } from "./middlewares/errorHandler";
+import { borrowRouter } from "./app/controllers/borrow.controllers";
 
 const app = express();
-
-app.use(express.json());
-
 app.get("/", (req: Request, res: Response) => {
   res.send("welcome to book library app");
 });
 
-// Routes
-app.use("/api/", booksRouter);
+app.use(express.json());
+app.use("/api", booksRouter);
+app.use("/api", borrowRouter);
 
-// Global error handler (should be after routes)
-// app.use(errorHandler);
+// Handle 404 Not Found
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.status(404).json({
+    success: false,
+    message: "page Not Found",
+    error: "The requested resource could not be found",
+  });
+  next();
+});
+
 //global error handler
+
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({

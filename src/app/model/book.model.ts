@@ -1,7 +1,7 @@
 import mongoose, { model, Schema } from "mongoose";
-import { IBook } from "../interface/book.interface";
+import { BookStaticMethod, IBook } from "../interface/book.interface";
 
-const bookSchema = new Schema<IBook>(
+const bookSchema = new Schema<IBook, BookStaticMethod>(
   {
     title: {
       type: String,
@@ -46,5 +46,37 @@ const bookSchema = new Schema<IBook>(
     timestamps: true,
   }
 );
+// static method If copies become 0, update available to false
 
-export const Book = model<IBook>("Book", bookSchema);
+bookSchema.statics.updateAvailability = async function (
+  bookId: string,
+  quantity: number
+) {
+  const book = await this.findById(bookId);
+  if (!book) return;
+
+  // Step 1: কমিয়ে দাও copies
+  book.copies -= quantity;
+
+  // Step 2: যদি 0 বা কম হয়ে যায়, available = false
+  if (book.copies <= 0) {
+    book.copies = 0; // নিচে না নামতে দাও
+    book.available = false;
+  }
+
+  // Step 3: যদি 0 এর বেশি হয়, available = true (optional)
+  else if (book.copies > 0) {
+    book.available = true;
+  }
+
+  await book.save();
+};
+
+bookSchema.pre("save", function (next) {
+  if (this.copies === 0) {
+    this.available = false;
+  }
+  next();
+});
+
+export const Book = model<IBook, BookStaticMethod>("Book", bookSchema);

@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "eslint": "^9.29.0",
+    "http": "^0.0.1-security",
     "mongoose": "^8.16.0",
     "prettier": "^3.5.3",
     "ts-node-dev": "^2.0.0"
