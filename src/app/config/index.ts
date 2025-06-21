@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
 export default {
-  port: process.env.PORT,
+  port: 5000,
   db_url: process.env.MONGODB_URL,
 };
